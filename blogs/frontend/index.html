@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <script>
+        const list = document.getElementsByTagName("li")
+        const appendArticlesToLi = (articles, li) => {
+            articles.forEach(article => li.appendChild(""))
+        }
+        const getArticles = () => {
+            fetch("127.0.0.1:5000/articles")
+                .then(res => res.json())
+                .then(console.log)
+                .then(appendArticlesToLi)
+        }
+    </script>
+    <body>
+        <h1>list of articles</h1>
+        <li></li>
+    </body>
+</html>
