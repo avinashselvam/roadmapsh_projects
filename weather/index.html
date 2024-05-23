@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <h1>Weather</h1>
+        <div>
+            <label>pincode</label>
+            <br>
+            <input type="text"/>
+            <button onclick="getWeatherDetails()">Get</button>
+        </div>
+        <p id="weather-result"></p>
+    </body>
+    <script>
+        const result = document.getElementById("weather-result")
+        
+        const getWeatherDetails = () => {
+            const pincode = document.getElementsByTagName("input").item(0)
+            fetch("http://127.0.0.1:5000/weather?pincode=" + pincode.innerText)
+                .then(console.log)
+                .then(res => res.json())
+                .then(console.log)
+        }
+
+    </script>
+</html>
