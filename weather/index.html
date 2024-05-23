@@ -13,13 +13,27 @@
     </body>
     <script>
         const result = document.getElementById("weather-result")
+
+        const displayResults = (response) => {
+            if(response['message'] == 'success') {
+                currentConditions = response['weather']['currentConditions']
+                var to_show = ""
+                to_show += currentConditions['conditions']
+                to_show += "\nTemperature : " + currentConditions['temp']
+                to_show += "\nfeels like : " + currentConditions['feelslike']
+                result.innerText = to_show
+            } else {
+                result.innerText = "failed to fetch weather details"
+            }
+        }
         
         const getWeatherDetails = () => {
             const pincode = document.getElementsByTagName("input").item(0)
-            fetch("http://127.0.0.1:5000/weather?pincode=" + pincode.innerText)
-                .then(console.log)
+            console.log(pincode, pincode.value)
+            fetch("http://127.0.0.1:5000/weather?pincode=" + pincode.value)
                 .then(res => res.json())
-                .then(console.log)
+                .then(displayResults)
+                // .then(console.log)
         }
 
     </script>
