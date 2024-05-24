@@ -23,8 +23,12 @@ CORS(app)
 
 API_KEY = os.environ.get('API_KEY')
 
+def get_cache_key():
+    pincode = request.args.get('pincode')
+    return f'pincode_{pincode}'
+
 @app.get("/weather")
-@cache.cached(timeout=3600)
+@cache.cached(timeout=3600, key_prefix=get_cache_key)
 def get_weather():
 
     pincode = request.args.get('pincode')

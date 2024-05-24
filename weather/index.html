@@ -16,7 +16,7 @@
 
         const displayResults = (response) => {
             if(response['message'] == 'success') {
-                currentConditions = response['weather']['currentConditions']
+                currentConditions = response['weather']['days'][0]
                 var to_show = ""
                 to_show += currentConditions['conditions']
                 to_show += "\nTemperature : " + currentConditions['temp']
