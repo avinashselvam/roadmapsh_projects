@@ -43,11 +43,17 @@ class Utils:
         decimal = []
         for i in range(len(base62)-1, -1, -1):
             decimal.append(Utils.mapping_to_decimal[base62[i]])
-        return "".join(decimal)
+        return "".join(decimal[::-1])
 
     def compute_shortened_url(idx):
         base62 = Utils.get_base62(idx)
+        if len(base62) < 6: base62 = (6-len(base62))*'0' + base62
         return "http://127.0.0.1:5000/" + base62
+    
+    def validate(short_url):
+        has_6_chars = len(short_url) == 6
+        contains_alphanum = short_url.isalnum()
+        return has_6_chars and contains_alphanum
 
 @app.post("/shorten")
 def make_short_url():
@@ -62,10 +68,21 @@ def make_short_url():
 
 @app.get("/<short_url>")
 def send_redirection(short_url):
-    idx = Utils.get_decimal(short_url)
-    required_url = db.session.query(URL).get(idx)
-    long_url = required_url.long_url
-    if not (long_url.startswith("http://") or long_url.startswith("https://")):
-        long_url = "http://" + long_url
-    return redirect(long_url)
+
+    url_valid = Utils.validate(short_url)
+    if url_valid:
+        idx = Utils.get_decimal(short_url)
+        idx = int(idx)+1 # db is 1 indexed
+        num_rows_in_db = db.session.query(URL).count()
+        if idx > num_rows_in_db:
+            response = "page doesn't exist. create short URLs at 127.0.0.1:8000/index.html", 400
+        else:
+            required_url = db.session.query(URL).get(idx)
+            print(required_url)
+            long_url = required_url.long_url
+            response = redirect(long_url)
+    else:
+        response = "not a valid short URL", 400
+    return response
+
 
