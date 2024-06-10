@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head></head>
+    <style>
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 25vw;
+            margin: 8px;
+        }
+    </style>
     <body>
         <form id="register_form">
             <label>register</label>
@@ -9,8 +17,8 @@
             <label for="register_password">password</label>
             <input id="register_password" type="text"/>
             <button id="register_button" onclick="register_user()">register</button>
-            <p id="resigter_response"></p>
         </form>
+        <p id="register_response"></p>
 
         <form id="login_form">
             <label>login</label>
@@ -19,10 +27,16 @@
             <label for="login_password">password</label>
             <input id="login_password" type="password"/>
             <button id="login_button" onclick="login_user()">log in</button>
-            <p id="login_response"></p>
         </form>
+        <p id="login_response"></p>
+
+        
+        <button onclick="request_authorised_content()">Get authorised content</button>
+        <p id="authorised_content_response"></p>
+
     </body>
     <script>
+
         const register_button = document.getElementById("register_button")
         const login_button = document.getElementById("login_button")
 
@@ -32,12 +46,17 @@
         const register_password = document.getElementById("register_password")
         const login_password = document.getElementById("login_password")
 
+        const register_response = document.getElementById("register_response")
+        const login_response = document.getElementById("login_response")
+        const authorised_content_response = document.getElementById("authorised_content_response")
+
+        let jwt = null
+
         const register_user = () => {
+
             event.preventDefault();
             username = register_username.value
             password = register_password.value
-
-            console.log(username, password)
 
             fetch("http://127.0.0.1:5000/users",
                 {
@@ -51,14 +70,18 @@
                     }
                 })
                 .then(res => res.json())
-                .then(console.log)
+                .then(res => {
+                    register_response.innerText = res.message
+                })
         }
 
         const login_user = () => {
+
             event.preventDefault();
             username = login_username.value
             password = login_password.value
-            fetch("http://127.0.0.1:5000/login",
+
+            fetch("http://127.0.0.1:5000/auth",
                 {
                     method: "POST",
                     body: JSON.stringify({
@@ -70,10 +93,35 @@
                     }
                 })
                 .then(res => res.json())
-                .then(console.log)
+                .then(res => {
+                    login_response.innerText = res.message
+                    console.log(res)
+                    if (res.success) {
+                        jwt = res.token
+                        console.log("token set", jwt)
+                    }
+                })
         }
 
-        
+        const request_authorised_content = () => {
+            if (jwt == null) {
+                console.log("not logged in")
+                return
+            }
+            fetch("http://127.0.0.1:5000/authorised_content",
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + jwt
+                    }
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        authorised_content_response.innerText = res.message
+                    }
+                })
+        }
 
     </script>
 </html>
