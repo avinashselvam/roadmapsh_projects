@@ -55,7 +55,7 @@ class Utils:
         contains_alphanum = short_url.isalnum()
         return has_6_chars and contains_alphanum
 
-@app.post("/shorten")
+@app.post("/urls")
 def make_short_url():
     data = request.get_json()
     long_url = data['long_url']
