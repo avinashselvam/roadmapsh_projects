@@ -1,18 +1,13 @@
 from flask_cors import CORS
 from flask import Flask, request
-from flask_sqlalchemy import SQLAlchemy
+from models import db, Theatre, Movie, User, Show, Seat, Ticket
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_booking_system.db"
 
-from theatres import Theatre
-from movies import Movie
-from users import User
-from shows import Show
-from seats import Seat
-from tickets import Ticket
-
-db = SQLAlchemy(app)
+with app.app_context():
+    db.init_app(app)
+    db.create_all()
 
 CORS(app)
 
@@ -25,11 +20,11 @@ def make_response(success, message, data):
         
 @app.get("/theatres")
 def get_list_of_theatres():
-    return db.session.query(Theatre).all()
+    return make_response(True, "fetched theatres successfully", db.session.query(Theatre).all()), 200
 
 @app.get("/movies")
 def get_list_of_movies():
-    return db.session.query(Movie).all()
+    return make_response(True, "fetched movies successfully", db.session.query(Movie).all()), 200
 
 @app.get("/shows")
 def get_list_of_shows():
@@ -70,6 +65,21 @@ def get_list_of_available_seats():
     unbooked_seats = all_seats.filter(~Seat.id.in_(booked_seats))
 
     return make_response(True, f"fetched unbooked seats for show {show_id}", unbooked_seats), 200
+
+@app.put("/tickets")
+def book_ticket():
+    
+    payload = request.get_json()
+    show_id = payload['show_id']
+    seat_id = payload['seat_id']
+    try:
+        db.session.add(Ticket(seat_id, show_id))
+        db.session.commit()
+        response = make_response(True, "ticket successfully booked", None), 201
+    except Exception as E:
+        print('failed to book ticket', E)
+        response = make_response(False, "unable to book the ticket", None), 500
+    return response
 
 
 
