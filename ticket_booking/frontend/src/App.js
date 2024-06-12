@@ -10,6 +10,7 @@ import ShowsList from './components/showslist';
 import SeatsList from './components/seatslist';
 
 import { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom'
 
 function App() {
 
@@ -24,6 +25,8 @@ function App() {
 
   // on show select
   // setTimeout(redirectToShowsList, 2*3600)
+
+	const navigate = useNavigate()
 
   const bookTickets = () => {
     fetch("http://127.0.0.1:5000/tickets", {
@@ -41,24 +44,49 @@ function App() {
 
   return (
     <div className="App">
-      <div className='phase one'>
-        <Switch setShowTheatres={setShowTheatres}/>
-        {showTheatres ? <TheatresList setSelectedTheatre={setSelectedTheatre}/> : <MoviesList setSelectedMovie={setSelectedMovie}/>}
-      </div>
-      <div className='phase two'>
-        <DateSelector setSelectedDate={setSelectedDate}/>
-        <ShowsList
-          selectedDate={selectedDate}
-          selectedTheatre={selectedTheatre}
-          selectedMovie={selectedMovie}
-          setSelectedShow={setSelectedShow}
-        />
-      </div>
-      <div className='phase three'>
-        <p>finish booking in 2 mins</p>
-        <SeatsList selectedShow={selectedShow} setSelectedSeat={setSelectedSeat}/>
-        <button onClick={bookTickets}>Book Seats</button>
-      </div>
+			<Routes>
+				<Route path='/' element={
+					<div>
+						<h1>Book Tickets</h1>
+
+						<form>
+								<input placeholder='username'></input>
+								<input placeholder='password'></input>
+								<button onClick={() => navigate('browse')}>login</button>
+						</form>
+
+						<form>
+								<input placeholder='username'></input>
+								<input placeholder='password'></input>
+								<button>sign up</button>
+						</form>
+					</div>}
+				/>
+				<Route path='/browse' element={
+					<div className='phase one'>
+						<Switch setShowTheatres={setShowTheatres}/>
+						{showTheatres ? <TheatresList setSelectedTheatre={setSelectedTheatre}/> : <MoviesList setSelectedMovie={setSelectedMovie}/>}
+					</div>}
+				/>
+				<Route path='shows' element={
+					<div className='phase two'>
+						<DateSelector setSelectedDate={setSelectedDate}/>
+						<ShowsList
+							selectedDate={selectedDate}
+							selectedTheatre={selectedTheatre}
+							selectedMovie={selectedMovie}
+							setSelectedShow={setSelectedShow}
+						/>
+					</div>}
+				/>
+				<Route path='seats' element={
+					<div className='phase three'>
+						<p>finish booking in 2 mins</p>
+						<SeatsList selectedShow={selectedShow} setSelectedSeat={setSelectedSeat}/>
+						<button onClick={bookTickets}>Book Seats</button>
+					</div>}
+				/>
+			</Routes>
     </div>
   );
 
