@@ -1,0 +1,17 @@
+.App {
+  display: flex;
+  flex-direction: row;
+}
+
+.phase {
+  flex: 1;
+  height: 100vh;
+}
+
+.one {
+  background-color: whitesmoke;
+}
+
+.three {
+  background-color: red;
+}
