@@ -14,11 +14,16 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 
 function App() {
 
+	const getTodaysDate = () => {
+		let date = new Date()
+		return date.toLocaleDateString()
+	}
+
   const [showTheatres, setShowTheatres] = useState(true) // boolen to display list of theatres / movies
   const [selectedTheatre, setSelectedTheatre] = useState() // holds the selected theatre id
   const [selectedMovie, setSelectedMovie] = useState() // holds the selected movie id
 
-  const [selectedDate, setSelectedDate] = useState() // date for which shows have to be displayed
+  const [selectedDate, setSelectedDate] = useState(getTodaysDate()) // date for which shows have to be displayed
   const [selectedShow, setSelectedShow] = useState() // holds the selected show id
 
   const [selectedSeat, setSelectedSeat] = useState() // holds the selected seat id
@@ -33,13 +38,16 @@ function App() {
 			method: "PUT",
 			body: JSON.stringify({
 					"show_id": selectedShow,
-					"seat_id": selectedSeat,
+					"seat_id": 5,
 					"user_id": 0
 			}),
 			headers: {
 					"Content-type": "application/json; charset=UTF-8"
 			}
 		})
+		.then(res => res.json())
+		.then(console.log)
+		.then(() => navigate('/browse'))
   }
 
   return (
@@ -52,7 +60,7 @@ function App() {
 						<form>
 								<input placeholder='username'></input>
 								<input placeholder='password'></input>
-								<button onClick={() => navigate('browse')}>login</button>
+								<button onClick={() => navigate('/browse')}>login</button>
 						</form>
 
 						<form>

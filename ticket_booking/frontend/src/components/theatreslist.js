@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import './theatreslist.css';
+
 const TheatresList = ({ setSelectedTheatre }) => {
 
     const navigate = useNavigate()
 
     const handleTheatreSelect = (theatre_id) => {
         setSelectedTheatre(theatre_id)
-        navigate('shows')
+        navigate('/shows')
     }
 
     const [listOfTheatres, setListOfTheatres] = useState([])
@@ -15,7 +17,12 @@ const TheatresList = ({ setSelectedTheatre }) => {
     const makeListOfTheatres = (theatres) => {
         let list = []
         for(let i=0; i<theatres.length; i+=1) {
-            list.push(<li onClick={() => handleTheatreSelect(theatres[i].id)}>{theatres[i].name}</li>)
+            list.push(
+                    <div className="theatre-card" onClick={() => handleTheatreSelect(theatres[i].id)}>
+                        <h3>{theatres[i].name}</h3>
+                        <p>{theatres[i].address}</p>
+                    </div>
+            )
         }
         return list
     }
@@ -32,7 +39,7 @@ const TheatresList = ({ setSelectedTheatre }) => {
 
     return <div>
         <h2>Theatres</h2>
-        <ul>{listOfTheatres}</ul>
+        {listOfTheatres}
     </div>
 
 }

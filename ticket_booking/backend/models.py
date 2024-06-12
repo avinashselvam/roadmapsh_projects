@@ -1,6 +1,6 @@
 from bcrypt import gensalt, hashpw, checkpw
 from flask_sqlalchemy import SQLAlchemy
-from datetime import timedelta
+from datetime import date, time, timedelta
 from dataclasses import dataclass
 
 db = SQLAlchemy()
@@ -16,27 +16,29 @@ class Movie(db.Model):
         self.name = name
         self.runtime_in_minutes = runtime
 
+@dataclass
 class Seat(db.Model):
 
     __tablename__ = 'seats'
-    id = db.Column(db.Integer, primary_key=True)
-    theatre_id = db.Column(db.Integer)
-    row = db.Column(db.String)
-    column = db.Column(db.String)
+    id: int = db.Column(db.Integer, primary_key=True)
+    theatre_id: int = db.Column(db.Integer)
+    row: str = db.Column(db.String)
+    column: str = db.Column(db.String)
 
     def __init__(self, theatre_id, row, column):
         self.theatre_id = theatre_id
         self.row = row
         self.column = column
 
+@dataclass
 class Show(db.Model):
 
     __tablename__ = 'shows'
-    id = db.Column(db.Integer, primary_key=True)
-    movie_id = db.Column(db.Integer)
-    theatre_id = db.Column(db.Integer)
-    start_date = db.Column(db.Date)
-    end_date = db.Column(db.Date)
+    id: int = db.Column(db.Integer, primary_key=True)
+    movie_id: int = db.Column(db.Integer)
+    theatre_id: int = db.Column(db.Integer)
+    start_date: date = db.Column(db.Date)
+    end_date: date = db.Column(db.Date)
     at = db.Column(db.Time)
 
     def __init__(self, movie_id, theatre_id, start_date, num_run_days, at):
@@ -64,11 +66,12 @@ class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     seat_id = db.Column(db.Integer)
     show_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
 
-    def __init__(self, seat_id, show_id):
+    def __init__(self, seat_id, show_id, user_id):
         self.seat_id = seat_id
         self.show_id = show_id
-
+        self.user_id = user_id
 
 class User(db.Model):
 

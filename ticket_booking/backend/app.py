@@ -12,39 +12,41 @@ def init_db_with_movies_theatres_seats():
         return
 
     # lets add 5 theatres
-    theatres = [
+    theatre_objects = [
         Theatre("PVR Nexus", "Koramangala"),
         Theatre("PVR Orion", "Yeshwanthpur"),
         Theatre("PVR Phoenix", "Whitefield"),
         Theatre("Cinepolis Gopalan Cinemas", "Old Madras Road"),
         Theatre("PVR Vega City", "Bannerghatta Road"),
     ]
-    db.session.add_all(theatres)
+    db.session.add_all(theatre_objects)
+    theatres = db.session.query(Theatre).all()
 
     # lets add 5 movies
-    movies = [
+    movie_objects = [
         Movie("Furiosa: A Mad Max Sage", 162),
         Movie("Hit Man", 154),
         Movie("The First Omen", 127),
         Movie("Bad Boys: Ride or Die", 177),
         Movie("Inside Out 2", 140),
     ]
-    db.session.add_all(movies)
+    db.session.add_all(movie_objects)
+    movies = db.session.query(Movie).all()
 
     # assuming all theatres have same seating arrangement
-    seats = []
+    seat_objects = []
     for theatre in theatres:
         for row in "ABCDEFGHIJKL":
             for col in range(1, 21):
-                seats.append(Seat(theatre.id, row, str(col)))
-    db.session.add_all(seats)
+                seat_objects.append(Seat(theatre.id, row, str(col)))
+    db.session.add_all(seat_objects)
 
     # all movies run on all theatres at different times
-    shows = []
+    shows_objects = []
     for theatre in theatres:
         for i, movie in enumerate(movies):
-            shows.append(Show(movie.id, theatre.id, date(2024, 6, 5), 3, time(9 + 2*i, 25)))
-    db.session.add_all(shows)
+            shows_objects.append(Show(movie.id, theatre.id, date(2024, 6, 12), 3, time(9 + 2*i, 25)))
+    db.session.add_all(shows_objects)
 
     db.session.commit()
 
@@ -57,7 +59,7 @@ CORS(app)
 
 def make_response(success, message, data):
     return {
-        "succes": success,
+        "success": success,
         "message": message,
         "data": data
     }
@@ -74,9 +76,13 @@ def get_list_of_movies():
 @app.get("/shows")
 def get_list_of_shows():
 
+    # TODO handle date
+    # TODO join with theatres and movies and fetch names
+
     # filter based on what the user has selected
     theatre_id = request.args.get('theatre_id', None)
     movie_id = request.args.get('movie_id', None)
+    date = request.args.get('date', None)
 
     if (theatre_id is None) and (movie_id is None):
         data = db.session.query(Show).all()
@@ -88,7 +94,7 @@ def get_list_of_shows():
         data = None
     
     if data is None:
-        response = make_response(False, "both filter mentioned", data), 400
+        response = make_response(False, "required args not passed", data), 400
     else:
         response = make_response(True, "fetched shows successfully", data), 200
     
@@ -107,7 +113,7 @@ def get_list_of_available_seats():
     # all the seats from the theatre that aren't booked already (i.e present in tickets table)
     all_seats = db.session.query(Seat).filter(Seat.theatre_id == show.theatre_id)
     booked_seats = db.session.query(Ticket).filter(Ticket.show_id == show.id).with_entities(Ticket.seat_id)
-    unbooked_seats = all_seats.filter(~Seat.id.in_(booked_seats))
+    unbooked_seats = all_seats.filter(~Seat.id.in_(booked_seats)).all()
 
     return make_response(True, f"fetched unbooked seats for show {show_id}", unbooked_seats), 200
 
@@ -115,12 +121,14 @@ def get_list_of_available_seats():
 def book_ticket():
     
     payload = request.get_json()
+    print(payload)
     show_id = payload['show_id']
     seat_id = payload['seat_id']
+    user_id = payload['user_id']
     try:
-        db.session.add(Ticket(seat_id, show_id))
+        db.session.add(Ticket(seat_id, show_id, user_id))
         db.session.commit()
-        response = make_response(True, "ticket successfully booked", None), 201
+        response = make_response(True, f"ticket successfully booked by {user_id} for {show_id} at seat {seat_id}", None), 201
     except Exception as E:
         print('failed to book ticket', E)
         response = make_response(False, "unable to book the ticket", None), 500
