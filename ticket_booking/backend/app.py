@@ -1,13 +1,57 @@
 from flask_cors import CORS
 from flask import Flask, request
 from models import db, Theatre, Movie, User, Show, Seat, Ticket
+from datetime import date, time
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_booking_system.db"
 
+def init_db_with_movies_theatres_seats():
+
+    if db.session.query(Theatre).count() > 0:
+        return
+
+    # lets add 5 theatres
+    theatres = [
+        Theatre("PVR Nexus", "Koramangala"),
+        Theatre("PVR Orion", "Yeshwanthpur"),
+        Theatre("PVR Phoenix", "Whitefield"),
+        Theatre("Cinepolis Gopalan Cinemas", "Old Madras Road"),
+        Theatre("PVR Vega City", "Bannerghatta Road"),
+    ]
+    db.session.add_all(theatres)
+
+    # lets add 5 movies
+    movies = [
+        Movie("Furiosa: A Mad Max Sage", 162),
+        Movie("Hit Man", 154),
+        Movie("The First Omen", 127),
+        Movie("Bad Boys: Ride or Die", 177),
+        Movie("Inside Out 2", 140),
+    ]
+    db.session.add_all(movies)
+
+    # assuming all theatres have same seating arrangement
+    seats = []
+    for theatre in theatres:
+        for row in "ABCDEFGHIJKL":
+            for col in range(1, 21):
+                seats.append(Seat(theatre.id, row, str(col)))
+    db.session.add_all(seats)
+
+    # all movies run on all theatres at different times
+    shows = []
+    for theatre in theatres:
+        for i, movie in enumerate(movies):
+            shows.append(Show(movie.id, theatre.id, date(2024, 6, 5), 3, time(9 + 2*i, 25)))
+    db.session.add_all(shows)
+
+    db.session.commit()
+
 with app.app_context():
     db.init_app(app)
     db.create_all()
+    init_db_with_movies_theatres_seats()
 
 CORS(app)
 
@@ -20,7 +64,8 @@ def make_response(success, message, data):
         
 @app.get("/theatres")
 def get_list_of_theatres():
-    return make_response(True, "fetched theatres successfully", db.session.query(Theatre).all()), 200
+    data = db.session.query(Theatre).all()
+    return make_response(True, "fetched theatres successfully", data), 200
 
 @app.get("/movies")
 def get_list_of_movies():

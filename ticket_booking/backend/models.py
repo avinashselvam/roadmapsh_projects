@@ -1,5 +1,7 @@
 from bcrypt import gensalt, hashpw, checkpw
 from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta
+from dataclasses import dataclass
 
 db = SQLAlchemy()
 
@@ -22,6 +24,10 @@ class Seat(db.Model):
     row = db.Column(db.String)
     column = db.Column(db.String)
 
+    def __init__(self, theatre_id, row, column):
+        self.theatre_id = theatre_id
+        self.row = row
+        self.column = column
 
 class Show(db.Model):
 
@@ -29,16 +35,24 @@ class Show(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.Integer)
     theatre_id = db.Column(db.Integer)
-    start_date = db.Column(db.DateTime)
-    end_date = db.Column(db.DateTime)
-    at = db.Column(db.DateTime)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    at = db.Column(db.Time)
 
+    def __init__(self, movie_id, theatre_id, start_date, num_run_days, at):
+        self.movie_id = movie_id
+        self.theatre_id = theatre_id
+        self.start_date = start_date
+        self.end_date = start_date + timedelta(days=num_run_days)
+        self.at = at
+
+@dataclass
 class Theatre(db.Model):
 
     __tablename__ = 'theatres'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    address = db.Column(db.String)
+    id: int = db.Column(db.Integer, primary_key=True)
+    name: str = db.Column(db.String)
+    address: str = db.Column(db.String)
 
     def __init__(self, name, address):
         self.name = name
@@ -68,5 +82,4 @@ class User(db.Model):
         self.hashed_password = hashpw(password, gensalt())
 
     def check_password(self, password):
-        print(password, self.hashed_password)
         return checkpw(password, self.hashed_password)
