@@ -1,0 +1,15 @@
+.theatre-card {
+    padding: 8px;
+}
+
+.theatre-card:hover {
+    background-color: lightgray;
+}
+
+.theatre-card h3 {
+    margin: 2px;
+}
+
+.theatre-card p {
+    margin: 2px 2px 8px 2px;
+}
