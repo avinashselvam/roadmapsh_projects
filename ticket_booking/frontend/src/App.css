@@ -6,3 +6,11 @@
   margin: 0 20vw;
   align-content: center;
 }
+
+.user-form {
+  width: 25vw;
+}
+
+.user-form form {
+  height: 75vh;
+}

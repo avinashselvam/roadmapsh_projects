@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 
+import './ticketslist.css'
+
 const TicketsList = ({ selectedShow, selectedSeat, userId }) => {
 
     const [listOfTickets, setListOfTickets] = useState([])
@@ -7,11 +9,13 @@ const TicketsList = ({ selectedShow, selectedSeat, userId }) => {
     const makeListOfTickets = (tickets) => {
         let list = []
         for(let i=0; i<tickets.length; i+=1) {
+            console.log(tickets[i])
+
             list.push(
                 <div className="ticket-card">
-                    {/* <p>theatre {tickets[i].theatre_id}</p> */}
-                    <p>show {tickets[i].show_id}</p>
-                    <p>seat {tickets[i].seat_id}</p>
+                    <h1 className="seat">{tickets[i].Seat.row + tickets[i].Seat.column}</h1>
+                    <p className="theatre-name">{tickets[i].Theatre.name}</p>
+                    <p className="movie-name">{tickets[i].Movie.name}</p>
                 </div>
             )
         }
@@ -29,7 +33,7 @@ const TicketsList = ({ selectedShow, selectedSeat, userId }) => {
     useEffect(fetchAndSetTickets, [])
 
     return <div>
-        <h3>Your Tickets</h3>
+        <h1>Your Tickets</h1>
         {listOfTickets}
     </div>
 

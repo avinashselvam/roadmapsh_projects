@@ -1,0 +1,16 @@
+.ticket-card {
+    padding: 8px;
+    border: 1px dashed gray;
+    margin: 8px 0;
+    position: relative;
+}
+
+.ticket-card p {
+    margin: 2px 2px 8px 2px;
+}
+
+.ticket-card .movie-name {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+}

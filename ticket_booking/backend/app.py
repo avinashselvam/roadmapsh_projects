@@ -2,9 +2,26 @@ from flask_cors import CORS
 from flask import Flask, request
 from models import db, Theatre, Movie, User, Show, Seat, Ticket
 from datetime import date, time, datetime
+import jwt
+import os
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_booking_system.db"
+app.config['SECRET'] = os.environ['SECRET']
+
+def protected(route):
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            try:
+                token = auth_header.split(" ")[1]
+                jwt.decode(token, app.config['SECRET'], algorithms=['HS256'])
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                return make_response(False, "Invalid token sent", None), 401
+        else:
+            return make_response(False, "Auth header not present", None), 401
+        return route(*args, **kwargs)
+    return decorated_function
 
 def init_db_with_movies_theatres_seats():
 
@@ -63,8 +80,50 @@ def make_response(success, message, data):
         "message": message,
         "data": data
     }
+
+@app.post("/auth")
+def login_user():
+
+    payload = request.get_json()
+
+    username = payload['username']
+    password = payload['password']
+
+    user = db.session.query(User).filter(User.username == username).scalar()
+    if user is None:
+        return make_response(False, "user does not exist. try signing up", None), 404
+    
+    correct_password = user.check_password(password)
+    if correct_password:
+        token = jwt.encode({"username": username}, app.config['SECRET'], 'HS256')
+        response = make_response(True, "logged in successfully", token), 200
+    else:
+        response = make_response(False, "wrong password", None), 401
+
+    return response
+    
+
+
+@app.put("/users")
+def signup_user():
+
+    payload = request.get_json()
+
+    username = payload['username']
+    password = payload['password']
+
+    user_exists = db.session.query(User).filter(User.username == username).count() > 0
+    if user_exists:
+        return make_response(False, "user already exists. try signing in", None), 409
+
+    user = User(username, password)
+    db.session.add(user)
+    db.session.commit()
+
+    return make_response(True, "signup successful", None), 201
         
 @app.get("/theatres")
+@protected
 def get_list_of_theatres():
     data = db.session.query(Theatre).all()
     return make_response(True, "fetched theatres successfully", data), 200
@@ -87,7 +146,17 @@ def get_list_of_shows():
     if (theatre_id is None) and (movie_id is None):
         data = db.session.query(Show).all()
     elif movie_id is None:
-        data = db.session.query(Show).filter(Show.theatre_id == theatre_id, Show.start_date <= show_date, show_date <= Show.end_date).all()
+        data = db.session.query(Show, Theatre, Movie). \
+        filter(
+            Show.theatre_id == theatre_id,
+            Show.start_date <= show_date,
+            show_date <= Show.end_date
+        ). \
+        join(Theatre, Show.theatre_id == Theatre.id). \
+        join(Movie, Show.movie_id == Movie.id). \
+        all()
+
+        data = [row._asdict() for row in data]
     elif theatre_id is None:
         data = db.session.query(Show).filter(Show.movie_id == movie_id, Show.start_date <= show_date, show_date <= Show.end_date).all()
     else:
@@ -143,9 +212,17 @@ def get_ticket_bookings_of_user():
     if user_id is None:
         return make_response(False, "user_id is a required argument", None)
     
-    tickets = db.session.query(Ticket).filter(Ticket.user_id == int(user_id)).all()
+    data = db.session.query(Ticket, Show, Theatre, Movie, Seat).\
+        filter(Ticket.user_id == int(user_id)).\
+        join(Show, Ticket.show_id == Show.id).\
+        join(Theatre, Show.theatre_id == Theatre.id).\
+        join(Movie, Show.movie_id == Movie.id).\
+        join(Seat, Ticket.seat_id == Seat.id).\
+        all()
+    
+    data = [row._asdict() for row in data]
 
-    return make_response(True, f"fetched tickets of {user_id}", tickets)
+    return make_response(True, f"fetched tickets of {user_id}", data)
 
 
 

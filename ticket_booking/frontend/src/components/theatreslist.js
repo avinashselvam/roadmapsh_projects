@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import './theatreslist.css';
 
-const TheatresList = ({ setSelectedTheatre }) => {
+const TheatresList = ({ token, setSelectedTheatre }) => {
 
     const navigate = useNavigate()
 
@@ -28,7 +28,12 @@ const TheatresList = ({ setSelectedTheatre }) => {
     }
 
     const fetchAndSetTheatres = () => {
-        fetch("http://127.0.0.1:5000/theatres")
+        fetch("http://127.0.0.1:5000/theatres", {
+			method: "GET",
+			headers: {
+				Authorization: "Bearer " + token
+			}
+        })
         .then(res => res.json())
         .then(res => res.data)
         .then(theatres => setListOfTheatres(makeListOfTheatres(theatres)))
