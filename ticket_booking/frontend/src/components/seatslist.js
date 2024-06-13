@@ -23,8 +23,7 @@ const SeatsList = ({ selectedShow, setSelectedSeat }) => {
     }
 
     const handleOnChange = (event) => {
-        console.log(event, event.value)
-        setSelectedSeat(event.value)
+        setSelectedSeat(event.target.value)
     }
 
     useEffect(fetchAndSetSeats, [])

@@ -1,0 +1,15 @@
+.movie-card {
+    padding: 8px;
+}
+
+.movie-card:hover {
+    background-color: lightgray;
+}
+
+.movie-card h3 {
+    margin: 2px;
+}
+
+.movie-card p {
+    margin: 2px 2px 8px 2px;
+}

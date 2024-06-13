@@ -5,12 +5,13 @@ from dataclasses import dataclass
 
 db = SQLAlchemy()
 
+@dataclass
 class Movie(db.Model):
 
     __tablename__ = 'movies'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    runtime_in_minutes = db.Column(db.Integer)
+    id: int = db.Column(db.Integer, primary_key=True)
+    name: str = db.Column(db.String)
+    runtime_in_minutes: int = db.Column(db.Integer)
 
     def __init__(self, name, runtime):
         self.name = name
@@ -60,13 +61,14 @@ class Theatre(db.Model):
         self.name = name
         self.address = address
 
+@dataclass
 class Ticket(db.Model):
 
     __tablename__ = 'tickets'
-    id = db.Column(db.Integer, primary_key=True)
-    seat_id = db.Column(db.Integer)
-    show_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
+    id: int = db.Column(db.Integer, primary_key=True)
+    seat_id: int = db.Column(db.Integer)
+    show_id: int = db.Column(db.Integer)
+    user_id: int = db.Column(db.Integer)
 
     def __init__(self, seat_id, show_id, user_id):
         self.seat_id = seat_id

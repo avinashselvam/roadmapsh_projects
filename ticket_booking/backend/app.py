@@ -1,7 +1,7 @@
 from flask_cors import CORS
 from flask import Flask, request
 from models import db, Theatre, Movie, User, Show, Seat, Ticket
-from datetime import date, time
+from datetime import date, time, datetime
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_booking_system.db"
@@ -76,20 +76,20 @@ def get_list_of_movies():
 @app.get("/shows")
 def get_list_of_shows():
 
-    # TODO handle date
     # TODO join with theatres and movies and fetch names
 
     # filter based on what the user has selected
     theatre_id = request.args.get('theatre_id', None)
     movie_id = request.args.get('movie_id', None)
-    date = request.args.get('date', None)
+    show_date = request.args.get('date', None)
+    show_date = datetime.strptime(show_date, "%d/%m/%Y").date()
 
     if (theatre_id is None) and (movie_id is None):
         data = db.session.query(Show).all()
     elif movie_id is None:
-        data = db.session.query(Show).filter(Show.theatre_id == theatre_id).all()
+        data = db.session.query(Show).filter(Show.theatre_id == theatre_id, Show.start_date <= show_date, show_date <= Show.end_date).all()
     elif theatre_id is None:
-        data = db.session.query(Show).filter(Show.movie_id == movie_id).all()
+        data = db.session.query(Show).filter(Show.movie_id == movie_id, Show.start_date <= show_date, show_date <= Show.end_date).all()
     else:
         data = None
     
@@ -121,7 +121,7 @@ def get_list_of_available_seats():
 def book_ticket():
     
     payload = request.get_json()
-    print(payload)
+
     show_id = payload['show_id']
     seat_id = payload['seat_id']
     user_id = payload['user_id']
@@ -132,7 +132,20 @@ def book_ticket():
     except Exception as E:
         print('failed to book ticket', E)
         response = make_response(False, "unable to book the ticket", None), 500
+
     return response
+
+@app.get("/tickets")
+def get_ticket_bookings_of_user():
+
+    user_id = request.args.get('user_id', None)
+    
+    if user_id is None:
+        return make_response(False, "user_id is a required argument", None)
+    
+    tickets = db.session.query(Ticket).filter(Ticket.user_id == int(user_id)).all()
+
+    return make_response(True, f"fetched tickets of {user_id}", tickets)
 
 
 

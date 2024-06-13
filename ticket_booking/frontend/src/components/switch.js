@@ -1,14 +1,15 @@
 const Switch = ({ setShowTheatres }) => {
 
     const handleOnChange = (event) => {
-        setShowTheatres(event.value)
+        // console.log(event.target.value, typeof(event.target.value), (event.target.value))
+        setShowTheatres(event.target.value === "true")
     } 
 
     return <div>
         <h2>Select by</h2>
         <select onChange={handleOnChange}>
-            <option value={true} selected>Theatres</option>
-            <option value={false}>Movies</option>
+            <option value="true">Theatres</option>
+            <option value="false">Movies</option>
         </select>
     </div>
 }

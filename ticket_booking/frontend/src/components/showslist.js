@@ -36,6 +36,7 @@ const ShowsList = ({ selectedDate, selectedTheatre, selectedMovie, setSelectedSh
 
     // on component mount fetch and set the data
     useEffect(fetchAndSetShows, [])
+    useEffect(fetchAndSetShows, [selectedDate])
 
     return <div>
         <h2>Shows</h2>

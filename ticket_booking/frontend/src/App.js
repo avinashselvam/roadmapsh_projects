@@ -9,6 +9,8 @@ import ShowsList from './components/showslist';
 
 import SeatsList from './components/seatslist';
 
+import TicketsList from './components/ticketslist';
+
 import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom'
 
@@ -73,7 +75,7 @@ function App() {
 				<Route path='/browse' element={
 					<div className='phase one'>
 						<Switch setShowTheatres={setShowTheatres}/>
-						{showTheatres ? <TheatresList setSelectedTheatre={setSelectedTheatre}/> : <MoviesList setSelectedMovie={setSelectedMovie}/>}
+						{showTheatres ? <TheatresList setSelectedTheatre={setSelectedTheatre}/> : <MoviesList setSelectedMovie={setSelectedMovie} />}
 					</div>}
 				/>
 				<Route path='shows' element={
@@ -92,6 +94,12 @@ function App() {
 						<p>finish booking in 2 mins</p>
 						<SeatsList selectedShow={selectedShow} setSelectedSeat={setSelectedSeat}/>
 						<button onClick={bookTickets}>Book Seats</button>
+					</div>}
+				/>
+				<Route path='profile' element={
+					<div className='phase'>
+						<h1>Avinash</h1>
+						<TicketsList />
 					</div>}
 				/>
 			</Routes>
