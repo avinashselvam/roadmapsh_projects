@@ -1,4 +1,5 @@
 import './App.css';
+import './tab.css'
 
 import Switch from './components/switch';
 import TheatresList from './components/theatreslist';
@@ -40,7 +41,7 @@ function App() {
 			method: "PUT",
 			body: JSON.stringify({
 					"show_id": selectedShow,
-					"seat_id": 5,
+					"seat_id": selectedSeat,
 					"user_id": 0
 			}),
 			headers: {
@@ -99,7 +100,7 @@ function App() {
 				<Route path='profile' element={
 					<div className='phase'>
 						<h1>Avinash</h1>
-						<TicketsList />
+						<TicketsList selectedShow={selectedShow} />
 					</div>}
 				/>
 			</Routes>

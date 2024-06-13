@@ -1,3 +1,5 @@
+import * as Tabs from '@radix-ui/react-tabs';
+
 const DateSelector = ({ setSelectedDate }) => {
 
     const handleOnChange = (event) => {
@@ -9,12 +11,20 @@ const DateSelector = ({ setSelectedDate }) => {
         let newDate = new Date();
         newDate.setDate(newDate.getDate() + i);
         const date_after_i_days = newDate.toLocaleDateString();
-        options.push(<option value={date_after_i_days}>{date_after_i_days}</option>);
+        options.push(<Tabs.Trigger className="TabsTrigger" value={date_after_i_days}>{date_after_i_days}</Tabs.Trigger>);
     }
 
     return <div>
         <h3>Select Date</h3>
-        <select onChange={handleOnChange}>{options}</select>
+        <Tabs.Root
+            className="TabsRoot"
+            defaultValue={(new Date()).toLocaleDateString()}
+            onValueChange={(value) => setSelectedDate(value)}
+        >
+            <Tabs.List className="TabsList">
+                {options}
+            </Tabs.List>
+        </Tabs.Root>
     </div>
 }
 

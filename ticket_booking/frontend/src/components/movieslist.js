@@ -38,7 +38,6 @@ const MoviesList = ({ setSelectedMovie }) => {
     useEffect(fetchAndSetMovies, [])
 
     return <div>
-        <h2>Movies</h2>
         {listOfMovies}
     </div>
 

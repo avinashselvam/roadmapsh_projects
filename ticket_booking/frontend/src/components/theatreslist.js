@@ -38,7 +38,6 @@ const TheatresList = ({ setSelectedTheatre }) => {
     useEffect(fetchAndSetTheatres, [])
 
     return <div>
-        <h2>Theatres</h2>
         {listOfTheatres}
     </div>
 

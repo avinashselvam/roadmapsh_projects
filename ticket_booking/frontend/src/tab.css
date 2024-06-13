@@ -1,0 +1,40 @@
+button {
+    all: unset;
+}
+
+.TabsRoot {
+    display: flex;
+    flex-direction: column;
+}
+  
+  .TabsList {
+    flex-shrink: 0;
+    display: flex;
+  }
+  
+.TabsTrigger {
+    background-color: white;
+    padding: 0 20px;
+    height: 45px;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    line-height: 1;
+    user-select: none;
+}
+
+.TabsTrigger:first-child {
+    border-top-left-radius: 6px;
+}
+.TabsTrigger:last-child {
+    border-top-right-radius: 6px;
+}
+.TabsTrigger:hover {
+    color: var(--violet-11);
+}
+.TabsTrigger[data-state='active'] {
+    color: green;
+    border-bottom: 1px solid green;
+}
