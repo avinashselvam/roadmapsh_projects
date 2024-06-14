@@ -3,3 +3,40 @@
     margin: 8px 25%;
     padding: 8px;
 } */
+
+.seats-row {
+    display: flex;
+    flex-direction: row;
+    margin: 8px;
+}
+
+.seats-row > * {
+    flex: 1;
+}
+
+.seats-row input {
+    box-sizing: border-box;
+  appearance: none;
+  background: white;
+  outline: 1px solid #333;
+  /* border: 3px solid white; */
+  width: 16px;
+  height: 16px;
+}
+
+.seats-row input:hover {
+    background-color: gray;
+}
+
+.seats-row input:checked {
+    background-color: black;
+}
+
+.seats-row input:disabled {
+    background-color: lightgray;
+    outline: 1px solid lightgray;
+}
+
+.seats-row p {
+    margin: 0;
+}

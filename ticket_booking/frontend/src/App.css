@@ -2,15 +2,56 @@
 
 }
 
+.home {
+  display: flex;
+  flex-direction: row;
+  margin: 8vh 5vw;
+}
+
+.home .landing {
+  flex: 2;
+}
+
+.home .landing h1 {
+  margin: 8px 24px;
+  font-size: 96px;
+}
+
+.home .landing h2 {
+  margin: 8px 24px;
+  font-size: 48px;
+  font-weight: 400;
+  color: gray;
+}
+
+.home .user-form {
+  flex: 1;
+  border: 1px solid gray;
+}
+
 .phase {
   margin: 0 20vw;
   align-content: center;
 }
 
-.user-form {
-  width: 25vw;
+.user-form form {
+  margin-top: 16px;
 }
 
-.user-form form {
-  height: 75vh;
+.user-form form input {
+  font-size: 14px;
+  height: 36px;
+  width: 90%;
+  margin: 8px 4%;
+  padding: 0 1%;
+}
+
+button {
+  font-size: 18px;
+  height: 48px;
+  width: 80%;
+  margin: 8px 10%;
+  background-color: black;
+  border: none;
+  color: white;
 }

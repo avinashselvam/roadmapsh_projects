@@ -1,4 +1,4 @@
-button {
+.TabsTrigger {
     all: unset;
 }
 
@@ -32,9 +32,9 @@ button {
     border-top-right-radius: 6px;
 }
 .TabsTrigger:hover {
-    color: var(--violet-11);
+    background-color: whitesmoke;
 }
 .TabsTrigger[data-state='active'] {
     color: green;
-    border-bottom: 1px solid green;
+    border-bottom: 3px solid green;
 }

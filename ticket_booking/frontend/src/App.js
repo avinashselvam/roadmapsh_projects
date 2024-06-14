@@ -19,6 +19,8 @@ import { Routes, Route, useNavigate } from 'react-router-dom'
 
 function App() {
 
+	const [rzp, setRzp] = useState()
+
 	const getTodaysDate = () => {
 		let date = new Date()
 		return date.toLocaleDateString()
@@ -26,8 +28,8 @@ function App() {
 
 	const [isLogin, setIsLogin] = useState(true) // boolen to display signup or login
 
-	const [username, setUsername] = useState()
-	const [password, setPassword] = useState()
+	const [username, setUsername] = useState("avi")
+	const [password, setPassword] = useState("avi")
 
 	const [jwt, setJwt] = useState()
 
@@ -62,6 +64,7 @@ function App() {
 	}	
 
 	const loginUser = (e) => {
+		console.log(username, password)
 		e.preventDefault();
 		fetch("http://127.0.0.1:5000/auth", {
 			method: "POST",
@@ -77,31 +80,75 @@ function App() {
 		.then(res => res.json())
 		.then(res => setJwt(res.data))
 		.then(() => navigate('/browse'))
+
+		// navigate('/browse')
 	}
 
+	const options = {
+		"key": "rzp_test_Yfy5mCLmWNC6v7",
+		"amount": "50000",
+		"currency": "INR",
+		"name": "Avinash's Ticket Booking System",
+		"description": "Movie ticket purchase",
+		"image": "https://avatars.githubusercontent.com/u/19776433?s=96&v=4",
+		"order_id": "order_OMXhKRFmqRi07h",
+		"callback_url": "http://localhost:3000/profile",
+		"prefill": {
+			"name": username,
+		},
+		"theme": {
+			"color": "#3399cc"
+		}
+	}
+
+	useEffect(() => {
+		const script = document.createElement("script")
+		script.src = "https://checkout.razorpay.com/v1/checkout.js"
+		document.body.appendChild(script)
+		script.onload = () => {
+		setRzp(window.Razorpay(options))
+		console.log(rzp)
+	}}, [])
+
+// curl -X POST https://api.razorpay.com/v1/orders \
+// -u 'rzp_test_Yfy5mCLmWNC6v7:T3DGXyX4zUmkfb4xDzx0IrBt' \
+// -H 'content-type:application/json' \
+// -d '{
+//     "amount": 500,
+//     "currency": "INR",
+//     "receipt": "qwsaq1",
+//     "partial_payment": true,
+//     "first_payment_min_amount": 230
+// }'
+
 	const bookTickets = () => {
-		fetch("http://127.0.0.1:5000/tickets", {
-			method: "PUT",
-			body: JSON.stringify({
-				"show_id": selectedShow,
-				"seat_id": selectedSeat,
-				"user_id": 0
-			}),
-			headers: {
-				"Content-type": "application/json; charset=UTF-8"
-			}
-		})
-		.then(res => res.json())
-		.then(console.log)
-		.then(() => navigate('/browse'))
+		rzp.open()
+		// fetch("http://127.0.0.1:5000/tickets", {
+		// 	method: "PUT",
+		// 	body: JSON.stringify({
+		// 		"show_id": selectedShow,
+		// 		"seat_id": selectedSeat,
+		// 		"user_id": 0
+		// 	}),
+		// 	headers: {
+		// 		"Content-type": "application/json; charset=UTF-8"
+		// 	}
+		// })
+		// .then(res => res.json())
+		// .then(console.log)
+		// .then(() => navigate('/profile'))
 	}
 
   	return (
     <div className="App">
 		<Routes>
 			<Route path='/' element={
-				<div>
+				<div className='home'>
+					<div className='landing'>
 					<h1>Book Tickets</h1>
+					<h2>for the latest movies</h2>
+					<h2>running in theatres near you</h2>
+					</div>
 					<div className='user-form'>
 						<Tabs.Root
 							className="TabsRoot"

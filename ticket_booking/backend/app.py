@@ -174,6 +174,8 @@ def get_list_of_available_seats():
 
     show_id = request.args.get('show_id', None)
 
+    print(show_id)
+
     if show_id is None:
         return make_response(False, "show id is a required parameter", None), 400
 

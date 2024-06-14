@@ -3,7 +3,8 @@
 }
 
 .theatre-card:hover {
-    background-color: lightgray;
+    background-color: whitesmoke;
+    cursor: pointer;
 }
 
 .theatre-card h3 {

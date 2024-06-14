@@ -3,7 +3,8 @@
 }
 
 .movie-card:hover {
-    background-color: lightgray;
+    background-color: whitesmoke;
+    cursor: pointer;
 }
 
 .movie-card h3 {

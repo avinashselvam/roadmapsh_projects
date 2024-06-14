@@ -3,7 +3,7 @@ import * as Tabs from '@radix-ui/react-tabs';
 const Switch = ({ setShowTheatres }) => {
 
     return <div>
-        <h2>Browse by by</h2>
+        <h2>Browse by</h2>
         <Tabs.Root
             className="TabsRoot"
             defaultValue="true"

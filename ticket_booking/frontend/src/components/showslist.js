@@ -18,7 +18,7 @@ const ShowsList = ({ selectedDate, selectedTheatre, selectedMovie, setSelectedSh
         let list = []
         for(let i=0; i<shows.length; i+=1) {
             list.push(
-                <div className="show-card" onClick={() => handleShowSelect(shows[i].id)}>
+                <div className="show-card" onClick={() => handleShowSelect(shows[i].Show.id)}>
                     {shows[i].Theatre.name}, {shows[i].Movie.name} {shows[i].at}
                 </div>
             )
