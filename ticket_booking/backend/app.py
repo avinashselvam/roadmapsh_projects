@@ -4,6 +4,7 @@ from models import db, Theatre, Movie, User, Show, Seat, Ticket
 from datetime import date, time, datetime
 import jwt
 import os
+import razorpay
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ticket_booking_system.db"
@@ -62,7 +63,7 @@ def init_db_with_movies_theatres_seats():
     shows_objects = []
     for theatre in theatres:
         for i, movie in enumerate(movies):
-            shows_objects.append(Show(movie.id, theatre.id, date(2024, 6, 12), 3, time(9 + 2*i, 25)))
+            shows_objects.append(Show(movie.id, theatre.id, date(2024, 6, 25), 3, time(9 + 2*i, 25)))
     db.session.add_all(shows_objects)
 
     db.session.commit()
@@ -174,8 +175,6 @@ def get_list_of_available_seats():
 
     show_id = request.args.get('show_id', None)
 
-    print(show_id)
-
     if show_id is None:
         return make_response(False, "show id is a required parameter", None), 400
 
@@ -195,7 +194,8 @@ def book_ticket():
 
     show_id = payload['show_id']
     seat_id = payload['seat_id']
-    user_id = payload['user_id']
+    username = payload['username']
+    user_id = db.session.query(User).filter(User.username == username).with_entities(User.id).scalar()
     try:
         db.session.add(Ticket(seat_id, show_id, user_id))
         db.session.commit()
@@ -225,6 +225,26 @@ def get_ticket_bookings_of_user():
     data = [row._asdict() for row in data]
 
     return make_response(True, f"fetched tickets of {user_id}", data)
+
+@app.get("/razorpay_orders")
+def get_razorpay_order_id():
+
+    amount = request.args.get('amount', None)
+
+    if amount is None:
+        return make_response(False, "amount arg required to create order", None), 400
+
+    client = razorpay.Client(auth=(os.environ.get('RZP_KEY'), os.environ.get('RZP_SECRET')))
+
+    resp = client.order.create({
+        "amount": amount,
+        "currency": "INR",
+    })
+
+    print(resp)
+
+    return make_response(True, "order succesfully created on razorpay", None)
+
 
 
 

@@ -14,12 +14,12 @@ import TicketsList from './components/ticketslist';
 
 import * as Tabs from '@radix-ui/react-tabs';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom'
 
-function App() {
+let rzp
 
-	const [rzp, setRzp] = useState()
+function App() {
 
 	const getTodaysDate = () => {
 		let date = new Date()
@@ -40,10 +40,7 @@ function App() {
 	const [selectedDate, setSelectedDate] = useState(getTodaysDate()) // date for which shows have to be displayed
 	const [selectedShow, setSelectedShow] = useState() // holds the selected show id
 
-	const [selectedSeat, setSelectedSeat] = useState() // holds the selected seat id
-
-  // on show select
-  // setTimeout(redirectToShowsList, 2*3600)
+	const [selectedSeat, setSelectedSeat] = useState() // holds the selected seat ids
 
 	const navigate = useNavigate()
 
@@ -61,10 +58,10 @@ function App() {
 		})
 		.then(res => res.json())
 		.then(console.log)
+		.then(() => {setIsLogin(true)})
 	}	
 
 	const loginUser = (e) => {
-		console.log(username, password)
 		e.preventDefault();
 		fetch("http://127.0.0.1:5000/auth", {
 			method: "POST",
@@ -76,68 +73,77 @@ function App() {
 				"Content-type": "application/json; charset=UTF-8"
 			}
 		})
-		// .then(console.log)
 		.then(res => res.json())
 		.then(res => setJwt(res.data))
 		.then(() => navigate('/browse'))
 
-		// navigate('/browse')
 	}
 
-	const options = {
-		"key": "rzp_test_Yfy5mCLmWNC6v7",
-		"amount": "50000",
-		"currency": "INR",
-		"name": "Avinash's Ticket Booking System",
-		"description": "Movie ticket purchase",
-		"image": "https://avatars.githubusercontent.com/u/19776433?s=96&v=4",
-		"order_id": "order_OMXhKRFmqRi07h",
-		"callback_url": "http://localhost:3000/profile",
-		"prefill": {
-			"name": username,
-		},
-		"theme": {
-			"color": "#3399cc"
+	const bookTickets = () => {
+		fetch("http://127.0.0.1:5000/tickets", {
+			method: "PUT",
+			body: JSON.stringify({
+				"show_id": selectedShow,
+				"seat_id": selectedSeat,
+				"username": username
+			}),
+			headers: {
+				"Content-type": "application/json; charset=UTF-8"
+			}
+		})
+		.then(res => res.json())
+		.then(console.log)
+		.then(() => navigate('/profile'))
+	}
+
+	const razorpaySuccessHandler = (res) => {
+		bookTickets()
+	}
+
+	const razorpayFailureHandler = (res) => {
+		console.log(res.error.code)
+		console.log(res.error.description)
+		console.log(res.error.reason)
+	}
+
+	const makeOptions = (amount, order_id) => { 
+		return {
+			"key": "rzp_test_Yfy5mCLmWNC6v7",
+			"amount": amount,
+			"currency": "INR",
+			"name": "Avinash's Ticket Booking System",
+			"description": "Movie ticket purchase",
+			"image": "https://avatars.githubusercontent.com/u/19776433?s=96&v=4",
+			"order_id": order_id,
+			"handler": razorpaySuccessHandler,
+			"prefill": {
+				"name": username,
+			},
+			"theme": {
+				"color": "#000"
+			}
 		}
 	}
 
-	useEffect(() => {
+	const openRazorpay = () => {
+		fetch("http://127.0.0.1:5000/razorpay_orders?amount" + "500")
+		.then(res => res.json())
+		.then(res => res.order_id)
+		.then((orderId) => {
+			const options = makeOptions(500, orderId)
+			rzp = window.Razorpay(options)
+			rzp.on('payment.failed', razorpayFailureHandler)
+			rzp.open()
+		})
+	}
+
+	const injectRazorpayScript = () => {
 		const script = document.createElement("script")
 		script.src = "https://checkout.razorpay.com/v1/checkout.js"
 		document.body.appendChild(script)
-		script.onload = () => {
-		setRzp(window.Razorpay(options))
-		console.log(rzp)
-	}}, [])
-
-// curl -X POST https://api.razorpay.com/v1/orders \
-// -u 'rzp_test_Yfy5mCLmWNC6v7:T3DGXyX4zUmkfb4xDzx0IrBt' \
-// -H 'content-type:application/json' \
-// -d '{
-//     "amount": 500,
-//     "currency": "INR",
-//     "receipt": "qwsaq1",
-//     "partial_payment": true,
-//     "first_payment_min_amount": 230
-// }'
-
-	const bookTickets = () => {
-		rzp.open()
-		// fetch("http://127.0.0.1:5000/tickets", {
-		// 	method: "PUT",
-		// 	body: JSON.stringify({
-		// 		"show_id": selectedShow,
-		// 		"seat_id": selectedSeat,
-		// 		"user_id": 0
-		// 	}),
-		// 	headers: {
-		// 		"Content-type": "application/json; charset=UTF-8"
-		// 	}
-		// })
-		// .then(res => res.json())
-		// .then(console.log)
-		// .then(() => navigate('/profile'))
 	}
+
+	useEffect(() => injectRazorpayScript, [])
 
   	return (
     <div className="App">
@@ -187,15 +193,14 @@ function App() {
 			/>
 			<Route path='seats' element={
 				<div className='phase three'>
-					<p>finish booking in 2 mins</p>
 					<SeatsList selectedShow={selectedShow} setSelectedSeat={setSelectedSeat}/>
-					<button onClick={bookTickets}>Book Seats</button>
+					<button onClick={openRazorpay}>Book Seats</button>
 				</div>}
 			/>
 			<Route path='profile' element={
 				<div className='phase'>
 					<h3>Hi, Avinash</h3>
-					<TicketsList selectedShow={selectedShow} />
+					<TicketsList userId={0} />
 				</div>}
 			/>
 		</Routes>

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 
 import './ticketslist.css'
 
-const TicketsList = ({ selectedShow, selectedSeat, userId }) => {
+const TicketsList = ({ userId }) => {
 
     const [listOfTickets, setListOfTickets] = useState([])
 
@@ -23,8 +23,9 @@ const TicketsList = ({ selectedShow, selectedSeat, userId }) => {
     }
 
     const fetchAndSetTickets = () => {
-        fetch("http://127.0.0.1:5000/tickets?user_id=0") // + userId)
+        fetch("http://127.0.0.1:5000/tickets?user_id=1") // + userId)
         .then(res => res.json())
+        // .then(console.log)
         .then(res => res.data)
         .then(tickets => setListOfTickets(makeListOfTickets(tickets)))
     }
