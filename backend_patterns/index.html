@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="">submit task</button>
+    <p id="progress"></p>
+</body>
+<script>
+    let taskId
+    const progress = document.getElementById("progress")
+
+    const submitTask = () => {
+        fetch("http://127.0.0.1:5000/tasks?sum_till=1000000")
+        .then(res => res.json())
+        .then(res => {
+            taskId = res.data.task_id
+        })
+        .then(() => setInterval(checkProgress, 1000))
+    }
+
+    const checkProgress = () => {
+        fetch("http://127.0.0.1:5000/status?task_id=" + taskId)
+        .then(res => res.json())
+        .then(res => {
+            progress.innerText = res.message
+        })
+    }
+</script>
+</html>
