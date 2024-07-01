@@ -8,13 +8,16 @@ from flask_cors import CORS
 CORS(app)
 
 def make_response(success, message, data = None):
+    """
+    utils functions to create responses in a uniform manner
+    """
     return {
         "success": success,
         "message": message,
         "data": data
     }
 
-@app.post("/tasks")
+@app.get("/tasks")
 def do_long_running_task():
     """
     creates task, delegates it and returns a task id
@@ -30,14 +33,15 @@ def do_long_running_task():
 
 @app.get("/status")
 def get_status():
+    """
+    queries the celery task's status given the task id and returns it
+    """
     task_id = request.args.get("task_id", None)
 
     if task_id is None:
         return make_response(False, "task_id is a required argument"), 401
     
     result = AsyncResult(task_id)
-
-    print(result, result.ready(), result.successful())
 
     if result.ready():
         if result.successful():

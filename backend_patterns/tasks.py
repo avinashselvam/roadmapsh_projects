@@ -7,6 +7,9 @@ celery_app = app.extensions["celery"]
 
 @shared_task
 def long_running_task(sum_till):
+    """
+    simulated long running task with sleep
+    """
     total = 0
     for i in range(sum_till):
         total += i

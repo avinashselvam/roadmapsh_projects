@@ -6,22 +6,28 @@
     <title>Document</title>
 </head>
 <body>
-    <button onclick="">submit task</button>
+    <button onclick="submitTask()">submit task</button>
     <p id="progress"></p>
 </body>
 <script>
     let taskId
+    let interval
     const progress = document.getElementById("progress")
 
+    // send request to long running task
     const submitTask = () => {
-        fetch("http://127.0.0.1:5000/tasks?sum_till=1000000")
+        fetch("http://127.0.0.1:5000/tasks?sum_till=10")
         .then(res => res.json())
         .then(res => {
+            console.log('response from tasks', res)
             taskId = res.data.task_id
         })
-        .then(() => setInterval(checkProgress, 1000))
+        .then(() => {
+            interval = setInterval(checkProgress, 1000)
+        })
     }
 
+    // check progress
     const checkProgress = () => {
         fetch("http://127.0.0.1:5000/status?task_id=" + taskId)
         .then(res => res.json())
