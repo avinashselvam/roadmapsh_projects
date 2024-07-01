@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE</title>
+</head>
+<body>
+    <button onclick="startStreaming()">start stream</button>
+    <p id="stream"></p>
+</body>
+<script>
+    const streamOutput = document.getElementById("stream")
+
+    const eventSource = new EventSource("http://127.0.0.1:5000/stream")
+
+    eventSource.onmessage = (e) => {
+        streamOutput.innerText += e.data + "\n"
+        if (e.data === '90') eventSource.close()
+    }
+</script>
+</html>
